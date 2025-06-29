@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground } from '
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types';
-import { registerUser } from '../../../firebase/auth';
+import { registerUser } from '../../services/authService';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Inscris'>;
@@ -29,24 +29,27 @@ const InscriptionScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       setError('');
       
-      // Utiliser la fonction registerUser de notre module auth
-      await registerUser(email, password, firstName, name);
+      // Utiliser la fonction registerUser de notre service d'authentification local
+      const user = await registerUser(email, password, firstName, name);
       
-      console.log('Utilisateur inscrit avec succès');
+      console.log('Utilisateur inscrit avec succès:', user);
       
-      // Rediriger vers la page d'accueil après inscription réussie
-      navigation.navigate('Home');
+      // La redirection principale est gérée par App.tsx via onAuthStateChanged
+      // Mais nous ajoutons une redirection explicite pour plus de sécurité
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
       
     } catch (err: any) {
       // Gérer les erreurs d'inscription
       let errorMessage = 'Une erreur est survenue lors de l\'inscription';
       
-      if (err.code === 'auth/email-already-in-use') {
+      // Adapter la gestion des erreurs pour notre service local
+      if (err.message === 'auth/email-already-in-use') {
         errorMessage = 'Cet email est déjà utilisé';
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (err.message === 'auth/invalid-email') {
         errorMessage = 'L\'adresse email est invalide';
-      } else if (err.code === 'auth/weak-password') {
-        errorMessage = 'Le mot de passe est trop faible';
       }
       
       setError(errorMessage);

@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../firebase/config';
+// Importations simplifiées pour la migration
+import { registerUser } from '../src/services/authService';
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Inscris'>;
+  navigation: any; // Simplification du typage pour la migration
 };
 
 const InscrisScreen: React.FC<Props> = ({ navigation }) => {
@@ -30,15 +28,10 @@ const InscrisScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       setError('');
       
-      // Créer un nouvel utilisateur avec email et mot de passe
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Utiliser notre service d'authentification local pour l'inscription
+      const user = await registerUser(email, password, firstName, name);
       
-      // Mettre à jour le profil de l'utilisateur avec son nom et prénom
-      await updateProfile(userCredential.user, {
-        displayName: `${firstName} ${name}`,
-      });
-      
-      console.log('Utilisateur inscrit avec succès:', userCredential.user);
+      console.log('Utilisateur inscrit avec succès:', user);
       
       // Rediriger vers la page d'accueil ou de connexion
       navigation.navigate('Splash');
@@ -47,9 +40,9 @@ const InscrisScreen: React.FC<Props> = ({ navigation }) => {
       // Gérer les erreurs d'inscription
       let errorMessage = 'Une erreur est survenue lors de l\'inscription';
       
-      if (err.code === 'auth/email-already-in-use') {
+      if (err.message === 'auth/email-already-in-use') {
         errorMessage = 'Cet email est déjà utilisé';
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (err.message === 'auth/invalid-email') {
         errorMessage = 'L\'adresse email est invalide';
       } else if (err.code === 'auth/weak-password') {
         errorMessage = 'Le mot de passe est trop faible';

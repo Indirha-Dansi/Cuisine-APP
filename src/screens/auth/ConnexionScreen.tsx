@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground } from '
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types';
-import { loginUser } from '../../../firebase/auth';
+import { loginUser } from '../../services/authService';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -26,23 +26,26 @@ const ConnexionScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       setError('');
       
-      // Utiliser la fonction loginUser de notre module auth
-      await loginUser(email, password);
-      console.log('Connexion réussie');
+      // Utiliser la fonction loginUser de notre service d'authentification local
+      const user = await loginUser(email, password);
+      console.log('Connexion réussie:', user);
       
-      // Rediriger vers la page d'accueil après connexion réussie
-      navigation.navigate('Home');
+      // La redirection principale est gérée par App.tsx via onAuthStateChanged
+      // Mais nous ajoutons une redirection explicite pour plus de sécurité
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainTabs' }],
+      });
       
     } catch (err: any) {
       // Gérer les erreurs de connexion
       let errorMessage = 'Une erreur est survenue lors de la connexion';
       
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+      // Adapter la gestion des erreurs pour notre service local
+      if (err.message === 'auth/user-not-found') {
         errorMessage = 'Email ou mot de passe incorrect';
-      } else if (err.code === 'auth/invalid-email') {
+      } else if (err.message === 'auth/invalid-email') {
         errorMessage = 'L\'adresse email est invalide';
-      } else if (err.code === 'auth/too-many-requests') {
-        errorMessage = 'Trop de tentatives de connexion. Veuillez réessayer plus tard';
       }
       
       setError(errorMessage);
