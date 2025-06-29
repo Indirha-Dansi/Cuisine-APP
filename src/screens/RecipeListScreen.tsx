@@ -42,7 +42,6 @@ const RecipesListScreen: React.FC = () => {
   const handleFavorites = (): void => {
     // Afficher uniquement les recettes favorites
     if (favorites.length === 0) {
-      // Utiliser une notification plus adaptée à React Native dans une version future
       console.log('Vous n\'avez pas encore de recettes favorites');
     } else {
       // Filtrer les recettes par favoris (fonctionnalité future)

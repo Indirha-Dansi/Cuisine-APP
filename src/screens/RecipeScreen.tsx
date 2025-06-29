@@ -27,6 +27,14 @@ const RecipeScreen: React.FC = () => {
   const route = useRoute();
   const { recipeId } = route.params as { recipeId: string };
 
+  const getImageSource = (image: any) => {
+    if (typeof image === 'string') {
+      return { uri: image };
+    } else {
+      return image;
+    }
+  };
+
   useEffect(() => {
     // Simuler un chargement
     const timer = setTimeout(() => {
@@ -106,7 +114,11 @@ const RecipeScreen: React.FC = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Image de la recette */}
-        <Image source={{ uri: recipe.image }} style={styles.recipeImage} />
+        <Image
+          source={getImageSource(recipe.image)}
+          style={styles.recipeImage}
+          resizeMode="cover"
+        />
         
         {/* Titre et badges */}
         <View style={styles.titleContainer}>

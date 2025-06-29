@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-// Importations simplifiées pour la migration
-import { loginUser } from '../src/services/authService';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 type Props = {
-  navigation: any; // Simplification du typage pour la migration
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
 };
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
@@ -25,21 +27,23 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       setError('');
       
-      // Utiliser notre service d'authentification local pour la connexion
-      const user = await loginUser(email, password);
-      console.log('Connexion réussie:', user);
+      // Connexion avec email et mot de passe
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Connexion réussie:', userCredential.user);
       
-      // La redirection sera gérée automatiquement par App.tsx via onAuthStateChanged
+      // Rediriger vers la page d'accueil ou le tableau de bord
+      navigation.navigate('Home'); // Assurez-vous que cette page existe dans votre navigation
       
     } catch (err: any) {
       // Gérer les erreurs de connexion
       let errorMessage = 'Une erreur est survenue lors de la connexion';
       
-      // Adapter la gestion des erreurs pour notre service local
-      if (err.message === 'auth/user-not-found') {
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         errorMessage = 'Email ou mot de passe incorrect';
-      } else if (err.message === 'auth/invalid-email') {
+      } else if (err.code === 'auth/invalid-email') {
         errorMessage = 'L\'adresse email est invalide';
+      } else if (err.code === 'auth/too-many-requests') {
+        errorMessage = 'Trop de tentatives de connexion. Veuillez réessayer plus tard';
       }
       
       setError(errorMessage);

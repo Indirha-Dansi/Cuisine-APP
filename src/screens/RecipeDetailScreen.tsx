@@ -27,7 +27,13 @@ const RecipeDetailScreen: React.FC = () => {
   const handleAction = (action: string): void => {
     console.log(`Action: ${action}`);
   };
-
+  const getImageSource = (image: any) => {
+    if (typeof image === 'string') {
+      return { uri: image };
+    } else {
+      return image;
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       <Header />
@@ -46,11 +52,11 @@ const RecipeDetailScreen: React.FC = () => {
 
         {/* Recipe Image */}
         <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: recipe.image }}
-            style={styles.recipeImage}
-            resizeMode="cover"
-          />
+            <Image
+              source={getImageSource(recipe.image)}
+              style={styles.recipeImage}
+              resizeMode="cover"
+            />
         </View>
 
         {/* Recipe Title */}
@@ -63,7 +69,7 @@ const RecipeDetailScreen: React.FC = () => {
           <Text style={styles.infoText}>📊 {recipe.difficulty}</Text>
         </View>
 
-        {/* Servings Counter */}
+        {/* Servings Counter */}  
         <View style={styles.servingsContainer}>
           <Text style={styles.servingsLabel}>Nombre de personne</Text>
           <View style={styles.counter}>

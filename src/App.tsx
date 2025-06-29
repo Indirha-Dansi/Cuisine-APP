@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StatusBar, View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import { onAuthStateChanged, User } from './services/authService';
+import { StatusBar, View, Text, ActivityIndicator } from 'react-native';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase/config';
 
 // Import des écrans
 import RecipesListScreen from './screens/RecipeListScreen';
@@ -23,30 +24,20 @@ import { colors } from './styles/colors';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Fonction pour rendre l'icône de l'onglet avec le nom de la route
-const renderTabIcon = ({ focused, route }: { focused: boolean; route: any }) => {
-  return <TabIcon focused={focused} routeName={route.name} />;
+// Définition du composant TabIcon en dehors du rendu
+type TabIconProps = {
+  focused: boolean;
 };
+
+const renderTabIcon = ({ focused }: TabIconProps) => <TabIcon focused={focused} />;
 
 // Composant de chargement pour l'authentification
 const AuthLoadingScreen = () => (
-  <View style={styles.loadingContainer}>
+  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
     <ActivityIndicator size="large" color={colors.primary} />
-    <Text style={styles.loadingText}>Chargement...</Text>
+    <Text style={{ marginTop: 10 }}>Chargement...</Text>
   </View>
 );
-
-// Styles pour le composant AuthLoadingScreen
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  loadingText: {
-    marginTop: 10
-  }
-});
 
 function MainTabs(): React.ReactElement {
   return (
@@ -117,12 +108,14 @@ function App(): React.ReactElement {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // S'abonner aux changements d'état d'authentification
-    const subscriber = onAuthStateChanged((currentUser: User | null) => {
+    // Fonction pour gérer les changements d'état d'authentification
+    function onAuthStateChange(currentUser: any) {
       setUser(currentUser);
       if (initializing) setInitializing(false);
-    });
+    }
     
+    // S'abonner aux changements d'état d'authentification
+    const subscriber = onAuthStateChanged(auth, onAuthStateChange);
     return subscriber; // Se désabonner lors du démontage
   }, [initializing]);
 

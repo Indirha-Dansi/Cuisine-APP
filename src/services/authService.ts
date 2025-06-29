@@ -23,11 +23,7 @@ let authStateListeners: ((user: User | null) => void)[] = [];
 
 // Fonction pour notifier les listeners du changement d'état
 const notifyAuthStateChanged = () => {
-  // Utiliser setTimeout pour s'assurer que la notification est envoyée de manière asynchrone
-  // Cela simule mieux le comportement de Firebase
-  setTimeout(() => {
-    authStateListeners.forEach(listener => listener(currentUser));
-  }, 0);
+  authStateListeners.forEach(listener => listener(currentUser));
 };
 
 // Fonction pour s'inscrire
