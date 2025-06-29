@@ -62,7 +62,7 @@ const InscriptionScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaProvider>
       <ImageBackground
-        source={require('../../assets/arriereplan.png')}
+        source={require('../../../asserts/arriereplan.png')}
         style={styles.background}
       >
         <SafeAreaView style={styles.container}>
