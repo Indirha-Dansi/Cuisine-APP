@@ -172,7 +172,7 @@ export const sampleRecipes: Recipe[] = [
   {
     id: '8',
     title: 'Mbongo Tchobi',
-    image: require('../../assets/images/recipes/8.jpg'),
+    image: require('../../assets/images/recipes/g8.jpg'),
     servings: 6,
     prepTime: 50,
     difficulty: 'hard',
