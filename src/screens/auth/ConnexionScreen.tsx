@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { RootStackParamList } from '../../types';
+import { loginUser } from '../../../firebase/auth';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
 };
 
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const ConnexionScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -27,12 +26,12 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       setError('');
       
-      // Connexion avec email et mot de passe
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Connexion réussie:', userCredential.user);
+      // Utiliser la fonction loginUser de notre module auth
+      await loginUser(email, password);
+      console.log('Connexion réussie');
       
-      // Rediriger vers la page d'accueil ou le tableau de bord
-      navigation.navigate('Home'); // Assurez-vous que cette page existe dans votre navigation
+      // Rediriger vers la page d'accueil après connexion réussie
+      navigation.navigate('Home');
       
     } catch (err: any) {
       // Gérer les erreurs de connexion
@@ -56,11 +55,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaProvider>
       <ImageBackground
-        source={require('/home/indirha-dansi/Documents/oh/ICT_202/nouveau/Cuisine/asserts/arriereplan.png')}
+        source={require('../../assets/arriereplan.png')}
         style={styles.background}
       >
         <SafeAreaView style={styles.container}>
-          <Text style={styles.title}>Connexion admin</Text>
+          <Text style={styles.title}>Connexion</Text>
 
           <TextInput
             style={styles.input}
@@ -90,16 +89,14 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.buttonText}>{loading ? 'Chargement...' : 'Se connecter'}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Splash')}>
-            <Text style={styles.linkText}>Retour à l'accueil</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Inscris')}>
+            <Text style={styles.linkText}>Pas encore de compte ? S'inscrire</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </ImageBackground>
     </SafeAreaProvider>
   );
 };
-
-export default LoginScreen;
 
 const styles = StyleSheet.create({
   background: {
@@ -122,36 +119,38 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    height: 45,
-    borderColor: 'black',
-    borderWidth: 1,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 12,
     marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   button: {
+    backgroundColor: '#c8bfa0',
+    borderRadius: 5,
+    padding: 15,
     alignItems: 'center',
-    backgroundColor: '#a0522d',
-    padding: 12,
-    borderRadius: 8,
     marginTop: 10,
   },
+  buttonDisabled: {
+    backgroundColor: '#cccccc',
+  },
   buttonText: {
-    color: '#ffffff',
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   linkText: {
+    color: '#666',
     textAlign: 'center',
-    marginTop: 15,
-    color: '#a0522d',
-    textDecorationLine: 'underline',
+    marginTop: 20,
   },
   errorText: {
     color: 'red',
     textAlign: 'center',
     marginBottom: 10,
   },
-  buttonDisabled: {
-    backgroundColor: '#cccccc',
-  },
 });
+
+export default ConnexionScreen;

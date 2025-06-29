@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/navigation';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../firebase/config';
+import { RootStackParamList } from '../../types';
+import { registerUser } from '../../../firebase/auth';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Inscris'>;
 };
 
-const InscrisScreen: React.FC<Props> = ({ navigation }) => {
+const InscriptionScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,18 +29,13 @@ const InscrisScreen: React.FC<Props> = ({ navigation }) => {
       setLoading(true);
       setError('');
       
-      // Créer un nouvel utilisateur avec email et mot de passe
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Utiliser la fonction registerUser de notre module auth
+      await registerUser(email, password, firstName, name);
       
-      // Mettre à jour le profil de l'utilisateur avec son nom et prénom
-      await updateProfile(userCredential.user, {
-        displayName: `${firstName} ${name}`,
-      });
+      console.log('Utilisateur inscrit avec succès');
       
-      console.log('Utilisateur inscrit avec succès:', userCredential.user);
-      
-      // Rediriger vers la page d'accueil ou de connexion
-      navigation.navigate('Splash');
+      // Rediriger vers la page d'accueil après inscription réussie
+      navigation.navigate('Home');
       
     } catch (err: any) {
       // Gérer les erreurs d'inscription
@@ -65,7 +59,7 @@ const InscrisScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaProvider>
       <ImageBackground
-        source={require('/home/indirha-dansi/Documents/oh/ICT_202/nouveau/Cuisine/asserts/arriereplan.png')}
+        source={require('../../assets/arriereplan.png')}
         style={styles.background}
       >
         <SafeAreaView style={styles.container}>
@@ -73,7 +67,7 @@ const InscrisScreen: React.FC<Props> = ({ navigation }) => {
           <TextInput
               style={styles.input}
               placeholder="Nom"
-              placeholderTextColor="#888" // <- couleur du texte du placeholder
+              placeholderTextColor="#888"
               onChangeText={setName}
               value={name}
             />
@@ -120,16 +114,14 @@ const InscrisScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.buttonText}>{loading ? 'Chargement...' : 'S\'inscrire'}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => navigation.navigate('Splash')}>
-            <Text style={styles.linkText}>Retour à l'accueil</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.linkText}>Déjà un compte ? Se connecter</Text>
           </TouchableOpacity>
         </SafeAreaView>
       </ImageBackground>
     </SafeAreaProvider>
   );
 };
-
-export default InscrisScreen;
 
 const styles = StyleSheet.create({
   background: {
@@ -152,36 +144,38 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   input: {
-    height: 45,
-    borderColor: 'gray',
-    borderWidth: 1,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    padding: 12,
     marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   button: {
+    backgroundColor: '#c8bfa0',
+    borderRadius: 5,
+    padding: 15,
     alignItems: 'center',
-    backgroundColor: '#a0522d',
-    padding: 12,
-    borderRadius: 8,
     marginTop: 10,
   },
+  buttonDisabled: {
+    backgroundColor: '#cccccc',
+  },
   buttonText: {
-    color: 'black',
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   linkText: {
+    color: '#666',
     textAlign: 'center',
-    marginTop: 15,
-    color: '#a0522d',
-    textDecorationLine: 'underline',
+    marginTop: 20,
   },
   errorText: {
     color: 'red',
     textAlign: 'center',
     marginBottom: 10,
   },
-  buttonDisabled: {
-    backgroundColor: '#cccccc',
-  },
 });
+
+export default InscriptionScreen;
