@@ -23,12 +23,10 @@ import { colors } from './styles/colors';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-// Définition du composant TabIcon en dehors du rendu
-type TabIconProps = {
-  focused: boolean;
+// Fonction pour rendre l'icône de l'onglet avec le nom de la route
+const renderTabIcon = ({ focused, route }: { focused: boolean; route: any }) => {
+  return <TabIcon focused={focused} routeName={route.name} />;
 };
-
-const renderTabIcon = ({ focused }: TabIconProps) => <TabIcon focused={focused} />;
 
 // Composant de chargement pour l'authentification
 const AuthLoadingScreen = () => (
